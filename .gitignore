@@ -1,0 +1,15 @@
+# Entorno virtual
+.venv/
+
+# Variables privadas
+.env
+
+# Credenciales
+credentials.json
+
+# Caché
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/

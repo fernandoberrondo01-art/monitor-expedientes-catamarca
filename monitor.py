@@ -47,10 +47,25 @@ for indice, fila in enumerate(datos, start=2):
             "user_repartition_code": fila["Código"]
         }
 
-        r = requests.get(API_URL, params=params, timeout=30)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+            "Accept": "application/json, text/plain, */*",
+            "Referer": "https://portal.catamarca.gob.ar/",
+            "Origin": "https://portal.catamarca.gob.ar"
+        }
+
+        r = requests.get(
+            API_URL,
+            params=params,
+            headers=headers,
+            timeout=30
+        )
+
+        print(f"Código HTTP: {r.status_code}")
 
         if r.status_code != 200:
             print(f"❌ Error HTTP: {r.status_code}")
+            print(r.text)
             continue
 
         respuesta = r.json()
@@ -72,7 +87,7 @@ for indice, fila in enumerate(datos, start=2):
         motivo_anterior = str(fila["Motivo"] or "").strip()
         reparticion_anterior = str(fila["Repartición"] or "").strip()
         sector_anterior = str(fila["Sector"] or "").strip()
-        
+
         print("--------------------------------")
         print(f"Expediente: {fila['Descripción']}")
         print(f"Estado Sheet : '{estado_anterior}'")
@@ -84,6 +99,7 @@ for indice, fila in enumerate(datos, start=2):
         print(f"Sector Sheet : '{sector_anterior}'")
         print(f"Sector API   : '{sector}'")
         print("--------------------------------")
+
         hubo_cambios = (
             estado_anterior != estado or
             motivo_anterior != motivo or
@@ -92,7 +108,6 @@ for indice, fila in enumerate(datos, start=2):
         )
 
         # Actualizar Google Sheets
-
         worksheet.update_cell(indice, 6, estado)
         worksheet.update_cell(indice, 7, ultimo_pase)
         worksheet.update_cell(indice, 8, motivo)
@@ -106,8 +121,7 @@ for indice, fila in enumerate(datos, start=2):
 
             worksheet.update_cell(indice, 12, ahora)
 
-            mensaje = f"""
-📢 EXPEDIENTE ACTUALIZADO
+            mensaje = f"""📢 EXPEDIENTE ACTUALIZADO
 
 📌 {fila["Descripción"]}
 
